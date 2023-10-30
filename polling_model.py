@@ -31,7 +31,7 @@ warnings.filterwarnings('ignore')
 
 ### IMPORT ALL DATA ###
 
-demo, map_dict, demo_r, cal, histe, histe_q1, res, res_ee, pollse, pshares, ppshares, ppshares_sc, scenarios, e_scenarios = import_and_process()
+demo, map_dict, demo_r, cal, histe, histe_q1, res, res_ee, pollse, pshares, ppshares, ppshares_sc, scenarios = import_and_process()
 
 ### SET ASIDE SOME YEARS FOR VALIDATION ###
 
@@ -39,16 +39,16 @@ setaside = random.choices(res_ee.year.unique(),k=8)
 
 ### BRING IN PREDICTIONS AND ERRORS FROM FUNDAMENTALS MODEL ###
 
-fund_prov_mse, fund_prov_mae, fund_comparison_df = generate_fundamentals(res_ee,pshares)
+fund_prov_mse, fund_prov_mae, fund_comparison_df = generate_fundamentals(res_ee,scenarios,pshares)
 
-### BRING IN PREDICTIONS AND ERRORS FROM PROVINCE-SPECIFIC RANDOM FOREST MODELS ###
+### BRING IN PREDICTIONS AND ERRORS FROM PROVINCE-SPECIFIC RANDOM FOREST MODELS, FOR EACH SCENARIO ###
 
 model_outputs = []
 
 for target_geo in res_ee.province.unique():
     row = {}
     row['target_geo'] = target_geo
-    daily_tonly_mse, daily_tonly_mae, daily_tonly_avg = target_only_model(target_geo,pollse,pshares,ppshares,pshares_sc)
+    daily_tonly_mse, daily_tonly_mae, daily_tonly_avg = target_only_model(target_geo,pollse,scenarios,pshares,ppshares,pshares_sc)
     # interpolate missing values in error datasets for the two RF models
     daily_tonly_mse_interp = days_df.\
         merge(daily_tonly_mse.sort_values(by='day'),on='day',how='left').interpolate(method='linear').bfill()
@@ -59,11 +59,11 @@ for target_geo in res_ee.province.unique():
     row['daily_tonly_avg'] = daily_tonly_avg
     model_outputs.append(row)
 
-### BRING IN PREDICTIONS AND ERRORS FROM ALL-BUT-PROVINCE RANDOM FOREST MODELS ###
+### BRING IN PREDICTIONS AND ERRORS FROM ALL-BUT-PROVINCE RANDOM FOREST MODELS, FOR EACH SCENARIO ###
 
 for row in model_outputs:
     target_geo = row['target_geo']
-    daily_allbut_mse, daily_allbut_mae, daily_allbut_avg = target_only_model(target_geo,pollse,pshares,ppshares,pshares_sc)
+    daily_allbut_mse, daily_allbut_mae, daily_allbut_avg = target_only_model(target_geo,pollse,scenarios,pshares,ppshares,pshares_sc)
     daily_allbut_mse_interp = days_df.\
         merge(daily_allbut_mse.sort_values(by='day'),on='day',how='left').interpolate(method='linear').bfill()
     daily_allbut_mae_interp = days_df.\

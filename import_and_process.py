@@ -169,6 +169,11 @@ def import_and_process():
     ### IMPORT POLLING AND ECONOMIC SCENARIOS ###
     
     scenarios = pd.read_csv('dataland_polls_2024_scenarios.csv')
+    scenarios['date_conducted'] = pd.to_datetime(scenarios['date_conducted'])
+    scenarios['date_conducted_q'] = scenarios['date_conducted'].apply(quarterly_date)
     e_scenarios = pd.read_csv('dataland_economic_data_2024_scenarios.csv')
+    e_scenarios['date'] = pd.to_datetime(e_scenarios['date'])
+    scenarios = scenarios.merge(e_scenarios,left_on=['date_conducted_q','scenario'],\
+                          right_on=['date','scenario'],how='left')
 
-    return demo, map_dict, demo_r, cal, histe, histe_q1, res, res_ee, pollse, pshares, ppshares, ppshares_sc, scenarios, e_scenarios
+    return demo, map_dict, demo_r, cal, histe, histe_q1, res, res_ee, pollse, pshares, ppshares, ppshares_sc, scenarios
