@@ -20,9 +20,9 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 
-from utils import split_data, quarterly_date
+from utils import split_data, quarterly_date, calc_variance
 
-def target_only_model(target_geo,pollse,pshares,ppshares,pshares_sc):
+def target_only_model(target_geo,pollse,scenarios,pshares,ppshares,pshares_sc):
 
     ### TARGET ONLY ###
 
@@ -35,7 +35,7 @@ def target_only_model(target_geo,pollse,pshares,ppshares,pshares_sc):
     # subset for target-only
     sub = pollse[pollse['geography']==target_geo]
 
-    X, y = split_data(sub[(~sub['year'].isin(setaside))],X_vars_cat,X_vars_num,y_vars)
+    X, y = split_data(sub,X_vars_cat,X_vars_num,y_vars)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
@@ -94,7 +94,7 @@ def target_only_model(target_geo,pollse,pshares,ppshares,pshares_sc):
 
 
     ### PREDICT ON UNSEEN DATA FOR FUN! ###
-    sa, sb = split_data(sub[sub['year']==setaside[0]],X_vars_cat,X_vars_num,y_vars)
+    sa, sb = split_data(scenarios,X_vars_cat,X_vars_num,y_vars)
 
     predictions_s = tonly_model.predict(sa)
 

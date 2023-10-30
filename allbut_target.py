@@ -20,9 +20,9 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 
-from utils import split_data, quarterly_date
+from utils import split_data, quarterly_date, calc_variance
 
-def allbut_target_model(target_geo,pollse,pshares,ppshares,pshares_sc):
+def allbut_target_model(target_geo,pollse,scenarios,pshares,ppshares,pshares_sc):
 
     ### ALL-BUT-TARGET ###
 
@@ -85,7 +85,7 @@ def allbut_target_model(target_geo,pollse,pshares,ppshares,pshares_sc):
 
 
     ### PREDICT ON UNSEEN DATA FOR FUN! ###
-    sa, sb = split_data(sub[sub['year']==setaside[0]],X_vars_cat,X_vars_num,y_vars)
+    sa, sb = split_data(scenarios,X_vars_cat,X_vars_num,y_vars)
 
     predictions_s = allbut_model.predict(sa)
 

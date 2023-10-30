@@ -43,3 +43,7 @@ def quarterly_date(dt: datetime):
     else:
         new_date = f"{dt.year}-09-30"
     return datetime.strptime(new_date,"%Y-%m-%d")
+
+def calc_variance(n,p):
+    var = n * (p * (1-p))
+    return var

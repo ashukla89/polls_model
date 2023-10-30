@@ -165,6 +165,10 @@ def import_and_process():
 
     # add incumbency
     pollse = pollse.merge(res[['year','party_in_power']].drop_duplicates(),on='year',how='left')
-
     
-    return demo, map_dict, demo_r, cal, histe, histe_q1, res, res_ee, pollse, pshares, ppshares, ppshares_sc
+    ### IMPORT POLLING AND ECONOMIC SCENARIOS ###
+    
+    scenarios = pd.read_csv('dataland_polls_2024_scenarios.csv')
+    e_scenarios = pd.read_csv('dataland_economic_data_2024_scenarios.csv')
+
+    return demo, map_dict, demo_r, cal, histe, histe_q1, res, res_ee, pollse, pshares, ppshares, ppshares_sc, scenarios, e_scenarios

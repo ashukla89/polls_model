@@ -20,9 +20,9 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 
-from utils import split_data
+from utils import split_data, calc_variance
 
-def generate_fundametals(res_ee,pshares):
+def generate_fundametals(res_ee,scenarios,pshares):
 
     X_vars_cat = ['province','region','party_in_power']
     X_vars_num = ['python_pop_share', 'cobolite_pop_share','javarian_pop_share',\
@@ -34,7 +34,7 @@ def generate_fundametals(res_ee,pshares):
     # subset for target-only
     sub = res_ee.copy()
 
-    X, y = split_data(sub[(~sub['year'].isin(setaside))],X_vars_cat,X_vars_num,y_vars)
+    X, y = split_data(sub,X_vars_cat,X_vars_num,y_vars)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
