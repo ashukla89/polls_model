@@ -28,7 +28,10 @@ def split_data(df,X_vars_cat,X_vars_num,y_vars):
         X = pd.concat([X_cat,X_num],axis=1)
     else:
         X = X_num
-    y = df[y_vars]
+    if len(y_vars) > 0:
+        y = df[y_vars]
+    else:
+        y = None
     
     return X, y
 

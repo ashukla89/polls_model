@@ -168,12 +168,35 @@ def import_and_process():
     
     ### IMPORT POLLING AND ECONOMIC SCENARIOS ###
     
+    # import scenarios
     scenarios = pd.read_csv('dataland_polls_2024_scenarios.csv')
     scenarios['date_conducted'] = pd.to_datetime(scenarios['date_conducted'])
     scenarios['date_conducted_q'] = scenarios['date_conducted'].apply(quarterly_date)
+    # import economic scenarios and join them
     e_scenarios = pd.read_csv('dataland_economic_data_2024_scenarios.csv')
     e_scenarios['date'] = pd.to_datetime(e_scenarios['date'])
     scenarios = scenarios.merge(e_scenarios,left_on=['date_conducted_q','scenario'],\
-                          right_on=['date','scenario'],how='left')
+                          right_on=['date','scenario'],how='left').drop('date_conducted_q',axis=1)
+
+    # extend in the same way we extend other polls
+    scaled_scen_polls = scenarios[ppshares].multiply(scenarios[ppshares].sum(axis=1)**-1,axis=0)
+    scaled_scen_polls.columns = ppshares_sc
+    scenarios = pd.concat([scenarios,scaled_scen_polls],axis=1)
+
+    # add calendar
+    scenarios = scenarios.merge(cal,left_on='year',right_on='election_cycle',how='left')
+
+    # transform date columns to datetime
+    scenarios[[col for col in scenarios.columns if 'date' in col]+['election_day']] = \
+        scenarios[[col for col in scenarios.columns if 'date' in col]+['election_day']].apply(pd.to_datetime)
+
+    # calculate days to election
+    scenarios['days_to_election'] = (scenarios['date_conducted'] - scenarios['election_day']).dt.days
+
+    # add demographic data
+    scenarios = scenarios.merge(demo_r,on='geography',how='left')
+
+    # add incumbency
+    scenarios['party_in_power'] = 'pdal'
 
     return demo, map_dict, demo_r, cal, histe, histe_q1, res, res_ee, pollse, pshares, ppshares, ppshares_sc, scenarios
